@@ -18,7 +18,8 @@ public class UDPClientMain {
 
         try {
 
-            String csvFile = "D:\\Anurita\\UW\\Fall 2016\\ADC\\kvp-operations.csv";
+           // String csvFile = "D:\\Anurita\\UW\\Fall 2016\\ADC\\kvp-operations.csv";
+            String csvFile=args[2];
             String host = args[0];
             String port = args[1];
             BufferedReader bufferedReader = new BufferedReader(new FileReader(csvFile));
