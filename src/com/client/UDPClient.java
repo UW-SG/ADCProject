@@ -24,6 +24,7 @@ public class UDPClient {
 
     //public static final String SEPARATOR = " ";
     private static final Log LOGGER = LogFactory.getLog(UDPClient.class);
+    public static final int MAX_RETRIES = 3;
 
     private List<Stats> statsList = new ArrayList<Stats>();
     Date beforeDate = null;
@@ -63,9 +64,28 @@ public class UDPClient {
             destAddr = InetAddress.getByName(host);
             destPort = Integer.parseInt(port);
             clientSocket = new DatagramSocket();
-            OperationUtils.sendPacket(dataPacket, destAddr, destPort, clientSocket);
             clientSocket.setSoTimeout(2000);
-            waitForAcknowledgement(clientSocket);
+
+            int currentAttempt = 0;
+            boolean completed = false;
+            while (currentAttempt <= MAX_RETRIES && !completed) {
+                if(currentAttempt > 0) {
+                    System.out.println(String.format("Retry attempt #%d for request: %s", currentAttempt,dataPacket));
+                }
+                OperationUtils.sendPacket(dataPacket, destAddr, destPort, clientSocket);
+                try {
+                    waitForAcknowledgement(clientSocket);
+                    completed = true;
+                } catch (Exception ex) {
+                    // TODO: log failure and retry
+                    System.out.println("Server timed-out for request: " + dataPacket);
+                    currentAttempt++;
+                }
+            }
+
+            if(!completed) {
+                System.out.println("Server timed-out even after 3 retries. Could not complete request: " + dataPacket);
+            }
 
         } catch (Exception e) {
             //TODO
@@ -74,13 +94,13 @@ public class UDPClient {
     }
 
     private String extractData(String packetString) {
-        // String after first ",". Eg for PUT,a,b this will return a,b
+        //return packetString.substring(packetString.indexOf("(") + 1, packetString.indexOf(")"));
+
         String data = packetString.substring(packetString.indexOf(",") + 1);
         return data;
     }
 
-    private void waitForAcknowledgement(DatagramSocket clientSocket) {
-        try {
+    private void waitForAcknowledgement(DatagramSocket clientSocket) throws Exception {
             byte[] receiveData = new byte[1024];
 
             DatagramPacket datagramPacket = new DatagramPacket(receiveData, receiveData.length);
@@ -92,11 +112,6 @@ public class UDPClient {
             long time = afterDate.getTime() - beforeDate.getTime();
             Stats currentStats = new Stats(dataPacket.getOperation().toString(), time);
             statsList.add(currentStats);
-
-        } catch (Exception e) {
-            //TODO
-            throw new RuntimeException(e);
-        }
     }
 
     public List<Stats> getStatsList() {

@@ -6,7 +6,7 @@
 	debug="true" threshold="all">
 
 	<appender name="udpClientLog" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="logs/UDPClient.log" />
+		<param name="File" value="src/logs/UDPClient.log" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
         <param name="Append" value="true"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -34,7 +34,7 @@
 	
 	<logger name="UDP_CLIENT_STATISTICS_LOG" additivity="false">
 		<level value="info" />
-		<appender-ref ref="rpcClientStats" />		
+		<appender-ref ref="udpClientStats" />
 	</logger>
 	
 	<!-- ROOT LOGGER -->

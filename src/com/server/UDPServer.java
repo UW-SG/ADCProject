@@ -5,7 +5,6 @@ import com.processor.UDPRequestHandler;
 import com.utility.DataPacket;
 import com.utility.DataStore;
 import com.utility.OperationUtils;
-import com.uw.adc.rmi.util.Constants;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -65,9 +64,9 @@ public class UDPServer {
                     udpServerSocket,
                     dataStore);
             //TODO logging
-            Constants.STATSLOGGER.info(System.currentTimeMillis() + " : Received request from : " + inputPacket.getAddress().toString() +
-                    " : " + ((Integer) inputPacket.getPort()).toString());
-            OperationUtils.perform(handler, dataPacket);
+          // System.out.println(System.currentTimeMillis() + " : Received request from : " + inputPacket.getAddress().toString() +
+              //      " : " + ((Integer) inputPacket.getPort()).toString());
+            OperationUtils.perform((UDPRequestHandler)handler, dataPacket);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

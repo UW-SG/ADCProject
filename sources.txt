@@ -1,6 +1,6 @@
 ./src/com/client/UDPClient.java
-./src/com/company/ClientMain.java
-./src/com/company/ServerMain.java
+./src/com/main/UDPClientMain.java
+./src/com/main/UDPServerMain.java
 ./src/com/Operation.java
 ./src/com/processor/RequestHandler.java
 ./src/com/processor/UDPRequestHandler.java

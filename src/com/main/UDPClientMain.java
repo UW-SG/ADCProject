@@ -1,5 +1,6 @@
 package com.main;
 
+import com.Operation;
 import com.client.UDPClient;
 import com.uw.adc.rmi.model.Stats;
 import com.uw.adc.rmi.util.Constants;
@@ -18,7 +19,8 @@ public class UDPClientMain {
 
         try {
 
-            String csvFile = "D:\\Anurita\\UW\\Fall 2016\\ADC\\kvp-operations.csv";
+           // String csvFile = "D:\\Anurita\\UW\\Fall 2016\\ADC\\test1.csv"; //kvp-operations.csv";
+            String csvFile = args[2];
             String host = args[0];
             String port = args[1];
             BufferedReader bufferedReader = new BufferedReader(new FileReader(csvFile));
@@ -65,16 +67,17 @@ public class UDPClientMain {
         while (i < statsList.size()) {
 
             Stats statsObj = statsList.get(i);
-            switch (statsObj.getOperation()) {
-                case "GET":
+            Operation op = Operation.fromValue(statsObj.getOperation());
+            switch (op) {
+                case GET:
                     getTotalTime = getTotalTime + statsObj.getTime();
                     ++getRequestCount;
                     break;
-                case "PUT":
+                case PUT:
                     putTotalTime = putTotalTime + statsObj.getTime();
                     ++putRequestCount;
                     break;
-                case "DEL":
+                case DELETE:
                     delTotalTime = delTotalTime + statsObj.getTime();
                     ++delRequestCount;
             }

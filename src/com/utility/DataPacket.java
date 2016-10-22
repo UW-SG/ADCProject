@@ -8,12 +8,12 @@ public class DataPacket implements Serializable {
     private Operation operation;
     private Boolean response;
     private String data;
-
-    private static Integer transId = 0;
+    private Integer transactionId;
+    private static Integer MAX_TRANSACTION_ID = 0;
 
     public DataPacket(String data) {
         this.data = data;
-        setTransId();
+        this.transactionId = MAX_TRANSACTION_ID++;
     }
 
     public Operation getOperation() {
@@ -32,12 +32,8 @@ public class DataPacket implements Serializable {
         this.response = response;
     }
 
-    public static Integer getTransId() {
-        return transId;
-    }
-
-    public static void setTransId() {
-        DataPacket.transId = transId++;
+    public Integer getTransactionId() {
+        return transactionId;
     }
 
     /**
@@ -56,6 +52,15 @@ public class DataPacket implements Serializable {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DataPacket(data=%s, response:%s, op:%s, transactionId: %s)",
+                data,
+                response,
+                operation,
+                MAX_TRANSACTION_ID);
     }
 
 }

@@ -1,12 +1,15 @@
 package com.utility;
 
 import com.Operation;
-import com.processor.RequestHandler;
+import com.processor.UDPRequestHandler;
+import com.uw.adc.rmi.util.Constants;
 
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -16,19 +19,35 @@ import java.util.zip.Inflater;
 public class OperationUtils {
 
     public static final String SEPARATOR = ",";
-    public static void perform(RequestHandler handler, DataPacket dataPacket) {
+
+    public static void perform(UDPRequestHandler handler, DataPacket dataPacket) {
 
         Operation op = dataPacket.getOperation();
 
         switch (op) {
 
             case PUT:
+                Constants.STATSLOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                       new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
+                        , handler.getClientAddr().toString(), (handler.getClientPort()).toString(),
+                        op.toString(), dataPacket.getData()));
                 handler.handlePut(dataPacket);
+
                 break;
             case GET:
+                System.out.println(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                        new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
+                        , handler.getClientAddr().toString(),
+                        (handler.getClientPort()).toString(),
+                        op.toString(),
+                        dataPacket.getData()));
                 handler.handleGet(dataPacket);
                 break;
             case DELETE:
+                System.out.println(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                        new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
+                        , handler.getClientAddr().toString(), (handler.getClientPort()).toString(),
+                        op.toString(), dataPacket.getData()));
                 handler.handleDelete(dataPacket);
                 break;
             case OTHER:
@@ -125,7 +144,6 @@ public class OperationUtils {
             throw new RuntimeException(e);
         }
     }
-
 
 
 }

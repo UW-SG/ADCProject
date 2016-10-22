@@ -29,7 +29,9 @@ public class UDPRequestHandler implements RequestHandler {
 
     @Override
     public void handleGet(DataPacket dataPacket) {
+
         responsePacket = dataStore.getValue(dataPacket.getData().trim());
+
         OperationUtils.sendPacket(responsePacket, this.clientAddr, this.clientPort, this.serverSocket);
 
     }
@@ -55,5 +57,46 @@ public class UDPRequestHandler implements RequestHandler {
     @Override
     public void handleMalformed(DataPacket dataPacket) {
 
+    }
+
+
+    public InetAddress getClientAddr() {
+        return clientAddr;
+    }
+
+    public void setClientAddr(InetAddress clientAddr) {
+        this.clientAddr = clientAddr;
+    }
+
+    public DatagramSocket getServerSocket() {
+        return serverSocket;
+    }
+
+    public void setServerSocket(DatagramSocket serverSocket) {
+        this.serverSocket = serverSocket;
+    }
+
+    public Integer getClientPort() {
+        return clientPort;
+    }
+
+    public void setClientPort(Integer clientPort) {
+        this.clientPort = clientPort;
+    }
+
+    public DataStore getDataStore() {
+        return dataStore;
+    }
+
+    public void setDataStore(DataStore dataStore) {
+        this.dataStore = dataStore;
+    }
+
+    public DataPacket getResponsePacket() {
+        return responsePacket;
+    }
+
+    public void setResponsePacket(DataPacket responsePacket) {
+        this.responsePacket = responsePacket;
     }
 }
