@@ -7,6 +7,7 @@ import com.uw.adc.rmi.util.Constants;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.uw.adc.rmi.util.Constants.STATSLOGGER;
@@ -18,11 +19,13 @@ public class UDPClientMain {
     public static void main(String args[]) {
 
         try {
+            System.out.println("Received args: " + Arrays.toString(args));
 
            // String csvFile = "D:\\Anurita\\UW\\Fall 2016\\ADC\\test1.csv"; //kvp-operations.csv";
             String csvFile = args[2];
             String host = args[0];
             String port = args[1];
+            System.out.println(String.format("Will now connect to server:port - %s:%s", host, port));
             BufferedReader bufferedReader = new BufferedReader(new FileReader(csvFile));
             UDPClient udpClient = new UDPClient();
             String currentData;
