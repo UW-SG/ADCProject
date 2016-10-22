@@ -1,4 +1,4 @@
-package com.company;
+package com.main;
 
 import com.client.UDPClient;
 import com.uw.adc.rmi.model.Stats;
@@ -13,7 +13,7 @@ import static com.uw.adc.rmi.util.Constants.STATSLOGGER;
 /**
  * Created by Anurita on 10/20/2016.
  */
-public class ClientMain {
+public class UDPClientMain {
     public static void main(String args[]) {
 
         try {
@@ -45,7 +45,7 @@ public class ClientMain {
             udpClient.encodePacket("DELETE(201)", host, port);
             udpClient.encodePacket("DELETE(301)", host, port);
             udpClient.encodePacket("DELETE(401)", host, port);*/
-            ClientMain.computePerformance(udpClient);
+            UDPClientMain.computePerformance(udpClient);
 
         } catch (Exception e) {
 

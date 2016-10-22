@@ -1,8 +1,8 @@
-package com.company;
+package com.main;
 
 import com.server.UDPServer;
 
-class ServerMain {
+class UDPServerMain {
     public static void main(String args[]) {
 
         try {
