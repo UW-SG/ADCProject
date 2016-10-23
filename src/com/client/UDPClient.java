@@ -11,8 +11,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.Operation.PUT;
 
@@ -100,7 +102,11 @@ public class UDPClient {
     private String extractData(String packetString) {
         //return packetString.substring(packetString.indexOf("(") + 1, packetString.indexOf(")"));
 
-        String data = packetString.substring(packetString.indexOf(",") + 1);
+       String data =  Arrays.stream(packetString.split(","))
+                .skip(1)
+                .map(s -> s.trim())
+                .collect(Collectors.joining(","));
+       // String data = packetString.substring(packetString.indexOf(",") + 1);
         return data;
     }
 

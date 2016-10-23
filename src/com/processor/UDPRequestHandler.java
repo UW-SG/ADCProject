@@ -29,9 +29,9 @@ public class UDPRequestHandler implements RequestHandler {
 
     @Override
     public void handleGet(DataPacket dataPacket) {
-
-        responsePacket = dataStore.getValue(dataPacket.getData().trim());
-
+        String data = dataPacket.getData();
+        String key = data.split(OperationUtils.SEPARATOR)[0].trim();
+        responsePacket = dataStore.getValue(key);
         OperationUtils.sendPacket(responsePacket, this.clientAddr, this.clientPort, this.serverSocket);
 
     }
