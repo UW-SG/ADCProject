@@ -23,7 +23,7 @@
 	</appender>
 
 	<appender name="udpLog" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="logs/UDP.log" />
+		<param name="File" value="logs/UDPClient.txt" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
         <param name="Append" value="true"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -40,6 +40,14 @@
         </layout>
 	</appender>
 
+    <appender name="udpServerLog" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="logs/UDPServerLog.txt" />
+        <param name="DatePattern" value="'.'yyyy-MM-dd" />
+        <param name="Append" value="true"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n" />
+        </layout>
+    </appender>
 	<!-- Console Appender -->
 	<appender name="default.console" class="org.apache.log4j.ConsoleAppender">
         <param name="target" value="System.out" />
@@ -58,7 +66,16 @@
 		<level value="info" />
 		<appender-ref ref="udpClientStats" />
 	</logger>
-	
+
+    <logger name="UDP_CLIENT_LOG" additivity="false">
+        <level value="info" />
+        <appender-ref ref="udpLog" />
+    </logger>
+
+    <logger name="UDP_SERVER_LOG" additivity="false">
+        <level value="info" />
+        <appender-ref ref="udpServerLog" />
+    </logger>
 	<!-- ROOT LOGGER -->
 	<root>
 		<priority value="debug" />				

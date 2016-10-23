@@ -1,7 +1,6 @@
 package com.utility;
 
-import com.Operation;
-import com.processor.UDPRequestHandler;
+import com.handler.UDPRequestHandler;
 import com.uw.adc.rmi.util.Constants;
 
 import java.io.*;
@@ -19,24 +18,21 @@ import java.util.zip.Inflater;
 public class OperationUtils {
 
     public static final String SEPARATOR = ",";
-
-    public static void perform(UDPRequestHandler handler, DataPacket dataPacket) {
-
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss.SSS");
+    public static void perform(UDPRequestHandler handler, DataPacket dataPacket, DatagramPacket inputPacket) {
         Operation op = dataPacket.getOperation();
-
         switch (op) {
 
             case PUT:
-                Constants.LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
-                       new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
+                Constants.UDP_SERVER_LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                        simpleDateFormat.format((new Date()).getTime())
                         , handler.getClientAddr().toString(), (handler.getClientPort()).toString(),
                         op.toString(), dataPacket.getData()));
                 handler.handlePut(dataPacket);
-
                 break;
             case GET:
-                Constants.LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
-                        new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
+                Constants.UDP_SERVER_LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                        simpleDateFormat.format((new Date()).getTime())
                         , handler.getClientAddr().toString(),
                         (handler.getClientPort()).toString(),
                         op.toString(),
@@ -44,106 +40,128 @@ public class OperationUtils {
                 handler.handleGet(dataPacket);
                 break;
             case DELETE:
-                Constants.LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
-                        new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
+                Constants.UDP_SERVER_LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                        simpleDateFormat.format((new Date()).getTime())
                         , handler.getClientAddr().toString(), (handler.getClientPort()).toString(),
                         op.toString(), dataPacket.getData()));
                 handler.handleDelete(dataPacket);
                 break;
             case OTHER:
+                Constants.UDP_SERVER_LOGGER.info(String.format("%s : Received unsolicited request from : %s : %s "+
+                                "of length %d",
+                        simpleDateFormat.format((new Date()).getTime())
+                        , handler.getClientAddr().toString(), (handler.getClientPort()).toString(),
+                         inputPacket.getLength()));
                 handler.handleMalformed(dataPacket);
                 break;
         }
-
     }
 
+    /**
+     * Serialization of data packet
+     *
+     * @param packet
+     * @return
+     * @throws IOException
+     */
     public static byte[] serialize(DataPacket packet) throws IOException {
-        ByteArrayOutputStream out = null;
-        ObjectOutput os = null;
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        ObjectOutput objectOutput = null;
         try {
-            out = new ByteArrayOutputStream();
-
-            os = new ObjectOutputStream(out);
-            //os.writeObject(1);
-            os.writeObject(packet);
-            os.flush();
-
-            return out.toByteArray();
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            objectOutput = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutput.writeObject(packet);
+            objectOutput.flush();
+            return byteArrayOutputStream.toByteArray();
         } finally {
-            os.close();
-            out.close();
+            objectOutput.close();
+            byteArrayOutputStream.close();
 
         }
     }
 
+    /**
+     * To compress the data packet after serializing
+     *
+     * @param bytes
+     * @return
+     */
     public static byte[] compress(byte[] bytes) {
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
             Deflater deflate = new Deflater();
             deflate.setLevel(Deflater.BEST_SPEED);
             deflate.setInput(bytes);
             deflate.finish();
-            byte[] tmp = new byte[4 * 1024];
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] tempBuffer = new byte[8 * 1024];
             while (!deflate.finished()) {
-                int size = deflate.deflate(tmp);
-                out.write(tmp, 0, size);
+                int size = deflate.deflate(tempBuffer);
+                byteArrayOutputStream.write(tempBuffer, 0, size);
             }
-            out.close();
-            return out.toByteArray();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            System.out.println("Error while save");
+            byteArrayOutputStream.close();
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception ex) {
+            Constants.UDP_SERVER_LOGGER.error(ex);
+            throw new RuntimeException(ex);
         }
-        System.exit(-1);
-        return null;
     }
 
+    /**
+     * Uncompress the data packet before deserializing
+     *
+     * @param bytes
+     * @return
+     */
     public static byte[] uncompress(byte[] bytes) {
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
             Inflater inflate = new Inflater();
             inflate.setInput(bytes);
-
-            byte[] buffer = new byte[4 * 1024];
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] tempBuffer = new byte[8 * 1024];
             while (!inflate.finished()) {
-                int size = inflate.inflate(buffer);
-                out.write(buffer, 0, size);
+                int size = inflate.inflate(tempBuffer);
+                byteArrayOutputStream.write(tempBuffer, 0, size);
             }
-            out.close();
-            return out.toByteArray();
+            byteArrayOutputStream.close();
+            return byteArrayOutputStream.toByteArray();
         } catch (Exception ex) {
-            //TODO
-            ex.printStackTrace();
-
+            Constants.UDP_SERVER_LOGGER.error(ex);
+            throw new RuntimeException(ex);
         }
-        return null;
     }
 
+    /**
+     * Deserialization of data packet at the destination
+     *
+     * @param data
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public static DataPacket deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInput objectInputStream = new ObjectInputStream(in);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+        ObjectInput objectInputStream = new ObjectInputStream(byteArrayInputStream);
         DataPacket dataPacket = (DataPacket) objectInputStream.readObject();
-        /*for (int i=0; i<size; i++) {
-
-            dataPacket = (DataPacket) objectInputStream.readObject();
-        }*/
         return dataPacket;
     }
 
+    /**
+     * Send packet across network
+     *
+     * @param outputPacket
+     * @param destAddr
+     * @param destPort
+     * @param sourceSocket
+     */
     public static void sendPacket(DataPacket outputPacket, InetAddress destAddr,
                                   Integer destPort, DatagramSocket sourceSocket) {
-
         try {
-
             byte output[] = OperationUtils.compress(OperationUtils.serialize(outputPacket));
-
             DatagramPacket outputDatagramPacket = new DatagramPacket(output, output.length, destAddr, destPort);
             sourceSocket.send(outputDatagramPacket);
         } catch (Exception e) {
-            //TODO logging
+            Constants.UDP_SERVER_LOGGER.error(e);
             throw new RuntimeException(e);
         }
     }
-
-
 }

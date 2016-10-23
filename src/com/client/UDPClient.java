@@ -1,9 +1,10 @@
 package com.client;
 
-import com.Operation;
+import com.utility.Operation;
 import com.utility.DataPacket;
 import com.utility.OperationUtils;
 import com.uw.adc.rmi.model.Stats;
+import com.uw.adc.rmi.util.Constants;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -14,7 +15,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.Operation.PUT;
 import static com.uw.adc.rmi.util.Constants.LOGGER;
 
 /**
@@ -30,7 +30,6 @@ public class UDPClient {
 
     public void encodePacket(String packetString, String host, String port) {
         beforeDate = new Date();
-       // String operation = packetString.substring(0, 3);
         String operation = packetString.split(OperationUtils.SEPARATOR)[0];
         String data = extractData(packetString);
         InetAddress destAddr = null;
@@ -42,7 +41,7 @@ public class UDPClient {
             switch (op) {
                 case PUT:
                     dataPacket = new DataPacket(data);
-                    dataPacket.setOperation(PUT);
+                    dataPacket.setOperation(Operation.PUT);
                     dataPacket.setResponse(Boolean.TRUE);
                     break;
                 case GET:
@@ -56,20 +55,19 @@ public class UDPClient {
                     dataPacket.setResponse(Boolean.TRUE);
                     break;
                 default:
-                    // TODO: log invalid operation
+                    dataPacket = new DataPacket("");
+                    dataPacket.setOperation(Operation.OTHER);
+                    dataPacket.setResponse(Boolean.FALSE);
+                    break;
             }
-
             destAddr = InetAddress.getByName(host);
             destPort = Integer.parseInt(port);
-           // System.out.println(String.format("Attempting to connect to server address: %s:%d", destAddr, destPort));
-
             clientSocket = new DatagramSocket();
             clientSocket.setSoTimeout(5000);
-
             int currentAttempt = 0;
             boolean completed = false;
             while (currentAttempt <= MAX_RETRIES && !completed) {
-                if(currentAttempt > 0) {
+                if (currentAttempt > 0) {
                     String msg = String.format("Retry attempt #%d for request: %s", currentAttempt, dataPacket);
                     LOGGER.info(msg);
                     System.out.println(msg);
@@ -85,47 +83,55 @@ public class UDPClient {
                     currentAttempt++;
                 }
             }
-
-            if(!completed) {
+            if (!completed) {
                 String msg = "Server timed-out even after 3 retries. Could not complete request: " + dataPacket;
                 LOGGER.error(msg);
                 System.out.println(msg);
             }
-
         } catch (Exception e) {
-            //TODO
+            Constants.LOGGER.error(e);
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Extract the key value paper from a given row
+     * @param packetString
+     * @return
+     */
     private String extractData(String packetString) {
 
-        String data =  Arrays.stream(packetString.split(","))
+        String data = Arrays.stream(packetString.split(","))
                 .skip(1)
                 .map(s -> s.trim())
                 .collect(Collectors.joining(","));
-       // String data = packetString.substring(packetString.indexOf(",") + 1);
+        // String data = packetString.substring(packetString.indexOf(",") + 1);
         return data;
     }
 
+    /**
+     * Client will wait for acknowledgement
+     * @param clientSocket
+     * @throws Exception
+     */
     private void waitForAcknowledgement(DatagramSocket clientSocket) throws Exception {
-            byte[] receiveData = new byte[1024];
-
-            DatagramPacket datagramPacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(datagramPacket);
-            receiveData = datagramPacket.getData();
-            DataPacket dataPacket = OperationUtils.deserialize(OperationUtils.uncompress(receiveData));
-            System.out.println(dataPacket.getData());
-            afterDate = new Date();
-            long time = afterDate.getTime() - beforeDate.getTime();
-            Stats currentStats = new Stats(dataPacket.getOperation().toString(), time);
-            statsList.add(currentStats);
+        byte[] receiveData = new byte[1024];
+        DatagramPacket datagramPacket = new DatagramPacket(receiveData, receiveData.length);
+        clientSocket.receive(datagramPacket);
+        receiveData = datagramPacket.getData();
+        DataPacket dataPacket = OperationUtils.deserialize(OperationUtils.uncompress(receiveData));
+        System.out.println(dataPacket.getData());
+        afterDate = new Date();
+        long time = afterDate.getTime() - beforeDate.getTime();
+        Stats currentStats = new Stats(dataPacket.getOperation().toString(), time);
+        statsList.add(currentStats);
     }
 
+    /**
+     * Get statistics for computing average and standard deviation
+     * @return
+     */
     public List<Stats> getStatsList() {
         return statsList;
     }
-
-
-
 }

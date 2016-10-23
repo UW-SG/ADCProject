@@ -1,7 +1,5 @@
 package com.utility;
 
-import com.Operation;
-
 import java.io.Serializable;
 
 public class DataPacket implements Serializable {

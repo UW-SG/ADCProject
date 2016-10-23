@@ -1,10 +1,11 @@
 package com.server;
 
-import com.processor.RequestHandler;
-import com.processor.UDPRequestHandler;
+import com.handler.RequestHandler;
+import com.handler.UDPRequestHandler;
 import com.utility.DataPacket;
 import com.utility.DataStore;
 import com.utility.OperationUtils;
+import com.uw.adc.rmi.util.Constants;
 
 import java.net.*;
 
@@ -18,62 +19,59 @@ public class UDPServer {
 
     public UDPServer(String port) {
         dataStore = new DataStore();
-
         try {
-           // udpServerSocket = new DatagramSocket(Integer.parseInt(port));
+            // udpServerSocket = new DatagramSocket(Integer.parseInt(port));
             udpServerSocket = new DatagramSocket(null);
-            System.out.println(InetAddress.getLocalHost().getHostAddress());
             InetSocketAddress inetSocketAddress = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(),
                     Integer.parseInt(port));
             udpServerSocket.bind(inetSocketAddress);
         } catch (Exception e) {
+            Constants.UDP_SERVER_LOGGER.error(e);
             throw new RuntimeException(e);
         }
-
     }
 
+    /**
+     * Start the server
+     */
     public void start() {
         try {
             while (true) {
-
                 byte input[] = new byte[1024];
                 DatagramPacket inputPacket = new DatagramPacket(input, input.length);
                 System.out.println("Waiting for client");
                 udpServerSocket.receive(inputPacket);
-
                 new Thread(() -> {
                     //System.out.println("Thread id is : " + Thread.currentThread().getId());
                     processRequest(inputPacket);
                 }).start();
-
             }
-
         } catch (Exception e) {
-            // TODO: 10/18/2016 logging
+            Constants.UDP_SERVER_LOGGER.error(e);
             throw new RuntimeException(e);
         } finally {
             udpServerSocket.close();
         }
     }
 
+    /**
+     * Deserialize the packet at server end and invoke appropriate PUT/GET/DELETE method
+     *
+     * @param inputPacket
+     */
     private void processRequest(DatagramPacket inputPacket) {
         try {
             byte inBlock[] = inputPacket.getData();
             DataPacket dataPacket = OperationUtils.deserialize(OperationUtils.uncompress(inBlock));
             //String inputRequest = new String(inBlock, 0, inBlock.length);
-
             RequestHandler handler = new UDPRequestHandler(inputPacket.getAddress(),
                     inputPacket.getPort(),
                     udpServerSocket,
                     dataStore);
-            //TODO logging
-          // System.out.println(System.currentTimeMillis() + " : Received request from : " + inputPacket.getAddress().toString() +
-              //      " : " + ((Integer) inputPacket.getPort()).toString());
-            OperationUtils.perform((UDPRequestHandler)handler, dataPacket);
+            OperationUtils.perform((UDPRequestHandler) handler, dataPacket, inputPacket);
         } catch (Exception e) {
+            Constants.UDP_SERVER_LOGGER.error(e);
             throw new RuntimeException(e);
         }
     }
-
-
 }

@@ -1,4 +1,4 @@
-package com;
+package com.utility;
 
 /**
  * Created by Anurita on 10/18/2016.

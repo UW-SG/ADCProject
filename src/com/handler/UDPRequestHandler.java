@@ -1,14 +1,17 @@
-package com.processor;
+package com.handler;
 
 import com.utility.DataPacket;
 import com.utility.DataStore;
+import com.utility.Operation;
 import com.utility.OperationUtils;
+import com.uw.adc.rmi.util.Constants;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class UDPRequestHandler implements RequestHandler {
-    // take DataStore and client address in constructor and save as private member
     private InetAddress clientAddr;
     private DatagramSocket serverSocket;
     private Integer clientPort;
@@ -27,15 +30,29 @@ public class UDPRequestHandler implements RequestHandler {
         this.clientPort = clientPort;
     }
 
+    /**
+     * Handle GET
+     *
+     * @param dataPacket
+     */
     @Override
     public void handleGet(DataPacket dataPacket) {
         String data = dataPacket.getData();
         String key = data.split(OperationUtils.SEPARATOR)[0].trim();
         responsePacket = dataStore.getValue(key);
+        Constants.UDP_SERVER_LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss.SSS").format((new Date()).getTime())
+                , this.getClientAddr().toString(), (this.getClientPort()).toString(),
+                responsePacket.getOperation().toString(), responsePacket.getData()));
         OperationUtils.sendPacket(responsePacket, this.clientAddr, this.clientPort, this.serverSocket);
 
     }
 
+    /**
+     * Handle PUT
+     *
+     * @param dataPacket
+     */
     @Override
     public void handlePut(DataPacket dataPacket) {
         String data = dataPacket.getData();
@@ -46,6 +63,11 @@ public class UDPRequestHandler implements RequestHandler {
 
     }
 
+    /**
+     * Handle DELETE
+     *
+     * @param dataPacket
+     */
     @Override
     public void handleDelete(DataPacket dataPacket) {
         String key = dataPacket.getData();
@@ -54,9 +76,16 @@ public class UDPRequestHandler implements RequestHandler {
 
     }
 
+    /**
+     * Handle Malformed packet
+     *
+     * @param dataPacket
+     */
     @Override
     public void handleMalformed(DataPacket dataPacket) {
-
+        responsePacket = new DataPacket("Received malformed packet");
+        responsePacket.setOperation(Operation.OTHER);
+        OperationUtils.sendPacket(responsePacket, this.clientAddr, this.clientPort, this.serverSocket);
     }
 
 
