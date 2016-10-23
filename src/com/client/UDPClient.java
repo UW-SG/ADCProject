@@ -64,7 +64,7 @@ public class UDPClient {
             destAddr = InetAddress.getByName(host);
             destPort = Integer.parseInt(port);
             clientSocket = new DatagramSocket();
-            clientSocket.setSoTimeout(2000);
+            clientSocket.setSoTimeout(5000);
 
             int currentAttempt = 0;
             boolean completed = false;
