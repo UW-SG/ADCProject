@@ -4,12 +4,13 @@ import com.utility.DataPacket;
 import com.utility.DataStore;
 import com.utility.Operation;
 import com.utility.OperationUtils;
-import com.uw.adc.rmi.util.Constants;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static com.uw.adc.rmi.util.Constants.UDP_SERVER_LOGGER;
 
 public class UDPRequestHandler implements RequestHandler {
     private InetAddress clientAddr;
@@ -40,7 +41,7 @@ public class UDPRequestHandler implements RequestHandler {
         String data = dataPacket.getData();
         String key = data.split(OperationUtils.SEPARATOR)[0].trim();
         responsePacket = dataStore.getValue(key);
-        Constants.UDP_SERVER_LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+        UDP_SERVER_LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
                 new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss.SSS").format((new Date()).getTime())
                 , this.getClientAddr().toString(), (this.getClientPort()).toString(),
                 responsePacket.getOperation().toString(), responsePacket.getData()));

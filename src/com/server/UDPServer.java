@@ -5,9 +5,13 @@ import com.handler.UDPRequestHandler;
 import com.utility.DataPacket;
 import com.utility.DataStore;
 import com.utility.OperationUtils;
-import com.uw.adc.rmi.util.Constants;
 
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
+import static com.uw.adc.rmi.util.Constants.UDP_SERVER_LOGGER;
 
 /**
  * Created by Anurita on 10/16/2016.
@@ -26,7 +30,7 @@ public class UDPServer {
                     Integer.parseInt(port));
             udpServerSocket.bind(inetSocketAddress);
         } catch (Exception e) {
-            Constants.UDP_SERVER_LOGGER.error(e);
+            UDP_SERVER_LOGGER.error(e);
             throw new RuntimeException(e);
         }
     }
@@ -47,7 +51,7 @@ public class UDPServer {
                 }).start();
             }
         } catch (Exception e) {
-            Constants.UDP_SERVER_LOGGER.error(e);
+            UDP_SERVER_LOGGER.error(e);
             throw new RuntimeException(e);
         } finally {
             udpServerSocket.close();
@@ -70,7 +74,7 @@ public class UDPServer {
                     dataStore);
             OperationUtils.perform((UDPRequestHandler) handler, dataPacket, inputPacket);
         } catch (Exception e) {
-            Constants.UDP_SERVER_LOGGER.error(e);
+            UDP_SERVER_LOGGER.error(e);
             throw new RuntimeException(e);
         }
     }
