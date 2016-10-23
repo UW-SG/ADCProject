@@ -1,5 +1,0 @@
----------PERFORMANCE ANALYSIS---------
-Average Compute time for UDP GET request:6ms
-Average Compute time for UDP PUT request:7ms
-Average Compute time for UDP DELETE request:3ms
----------PERFORMANCE ANALYSIS COMPLETE---------
