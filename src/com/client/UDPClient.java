@@ -63,6 +63,9 @@ public class UDPClient {
 
             destAddr = InetAddress.getByName(host);
             destPort = Integer.parseInt(port);
+            System.out.println(String.format("Attempting to connect to server address: %s:%d", destAddr, destPort));
+
+
             clientSocket = new DatagramSocket();
             clientSocket.setSoTimeout(5000);
 
