@@ -27,7 +27,7 @@ public class OperationUtils {
         switch (op) {
 
             case PUT:
-                Constants.STATSLOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                Constants.LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
                        new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
                         , handler.getClientAddr().toString(), (handler.getClientPort()).toString(),
                         op.toString(), dataPacket.getData()));
@@ -35,7 +35,7 @@ public class OperationUtils {
 
                 break;
             case GET:
-                System.out.println(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                Constants.LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
                         new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
                         , handler.getClientAddr().toString(),
                         (handler.getClientPort()).toString(),
@@ -44,7 +44,7 @@ public class OperationUtils {
                 handler.handleGet(dataPacket);
                 break;
             case DELETE:
-                System.out.println(String.format("%s : Received request from : %s : %s to do %s ( %s )",
+                Constants.LOGGER.info(String.format("%s : Received request from : %s : %s to do %s ( %s )",
                         new SimpleDateFormat("yyyy/MM/dd: HH:mm:ss").format((new Date()).getTime())
                         , handler.getClientAddr().toString(), (handler.getClientPort()).toString(),
                         op.toString(), dataPacket.getData()));

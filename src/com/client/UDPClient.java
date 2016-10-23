@@ -4,8 +4,6 @@ import com.Operation;
 import com.utility.DataPacket;
 import com.utility.OperationUtils;
 import com.uw.adc.rmi.model.Stats;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -17,15 +15,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.Operation.PUT;
+import static com.uw.adc.rmi.util.Constants.LOGGER;
 
 /**
  * Created by Anurita on 10/16/2016.
  */
 public class UDPClient {
 
-
-    //public static final String SEPARATOR = " ";
-    private static final Log LOGGER = LogFactory.getLog(UDPClient.class);
     public static final int MAX_RETRIES = 3;
 
     private List<Stats> statsList = new ArrayList<Stats>();
@@ -65,8 +61,7 @@ public class UDPClient {
 
             destAddr = InetAddress.getByName(host);
             destPort = Integer.parseInt(port);
-            System.out.println(String.format("Attempting to connect to server address: %s:%d", destAddr, destPort));
-
+           // System.out.println(String.format("Attempting to connect to server address: %s:%d", destAddr, destPort));
 
             clientSocket = new DatagramSocket();
             clientSocket.setSoTimeout(5000);
@@ -75,22 +70,26 @@ public class UDPClient {
             boolean completed = false;
             while (currentAttempt <= MAX_RETRIES && !completed) {
                 if(currentAttempt > 0) {
-                    System.out.println(String.format("Retry attempt #%d for request: %s", currentAttempt,dataPacket));
+                    String msg = String.format("Retry attempt #%d for request: %s", currentAttempt, dataPacket);
+                    LOGGER.info(msg);
+                    System.out.println(msg);
                 }
                 OperationUtils.sendPacket(dataPacket, destAddr, destPort, clientSocket);
                 try {
                     waitForAcknowledgement(clientSocket);
                     completed = true;
                 } catch (Exception ex) {
-                    // TODO: log failure and retry
-                    System.out.println("Exception: " + ex.getMessage());
-                    System.out.println("Server timed-out for request: " + dataPacket);
+                    String msg = "Server timed-out for request: " + dataPacket;
+                    LOGGER.error(msg);
+                    System.out.println(msg);
                     currentAttempt++;
                 }
             }
 
             if(!completed) {
-                System.out.println("Server timed-out even after 3 retries. Could not complete request: " + dataPacket);
+                String msg = "Server timed-out even after 3 retries. Could not complete request: " + dataPacket;
+                LOGGER.error(msg);
+                System.out.println(msg);
             }
 
         } catch (Exception e) {
@@ -100,9 +99,8 @@ public class UDPClient {
     }
 
     private String extractData(String packetString) {
-        //return packetString.substring(packetString.indexOf("(") + 1, packetString.indexOf(")"));
 
-       String data =  Arrays.stream(packetString.split(","))
+        String data =  Arrays.stream(packetString.split(","))
                 .skip(1)
                 .map(s -> s.trim())
                 .collect(Collectors.joining(","));

@@ -10,7 +10,7 @@ import java.io.FileReader;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.uw.adc.rmi.util.Constants.STATSLOGGER;
+import static com.uw.adc.rmi.util.Constants.UDP_STATS_LOGGER;
 
 /**
  * Created by Anurita on 10/20/2016.
@@ -44,7 +44,7 @@ public class UDPClientMain {
 
     private static void computePerformance(UDPClient udpClient) {
 
-        Constants.STATSLOGGER.info("---------PERFORMANCE ANALYSIS---------");
+        Constants.UDP_STATS_LOGGER.info("---------PERFORMANCE ANALYSIS---------");
 
         int i = 0;
         long getTotalTime = 0, putTotalTime = 0, delTotalTime = 0;
@@ -73,13 +73,13 @@ public class UDPClientMain {
         }
 
         if (getRequestCount > 0)
-            System.out.println("Average Compute time for UDP GET request:" + getTotalTime / getRequestCount + "ms");
+            UDP_STATS_LOGGER.info("Average Compute time for UDP GET request:" + getTotalTime / getRequestCount + "ms");
         if (putRequestCount > 0)
-            System.out.println("Average Compute time for UDP PUT request:" + putTotalTime / putRequestCount + "ms");
+            UDP_STATS_LOGGER.info("Average Compute time for UDP PUT request:" + putTotalTime / putRequestCount + "ms");
         if (delRequestCount > 0)
-            System.out.println("Average Compute time for UDP DELETE request:" + delTotalTime / delRequestCount + "ms");
+            UDP_STATS_LOGGER.info("Average Compute time for UDP DELETE request:" + delTotalTime / delRequestCount + "ms");
 
-        STATSLOGGER.info("---------PERFORMANCE ANALYSIS COMPLETE---------");
+        UDP_STATS_LOGGER.info("---------PERFORMANCE ANALYSIS COMPLETE---------");
 
     }
 }

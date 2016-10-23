@@ -4,9 +4,26 @@
 	"http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd"> -->
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
 	debug="true" threshold="all">
+	<appender name="rpcClientLog" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/RPCClient.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<param name="Append" value="true"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+	</appender>
 
-	<appender name="udpClientLog" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="src/logs/UDPClient.log" />
+	<appender name="rpcClientStats" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/RPCClientStatistics.txt" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<param name="Append" value="true"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+	</appender>
+
+	<appender name="udpLog" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="src/logs/UDP.log" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
         <param name="Append" value="true"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -30,8 +47,13 @@
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d{ISO8601} %-5p [%c{1}] - %m%n" />
         </layout>
-    </appender>	
-	
+    </appender>
+
+    <logger name="RPC_CLIENT_STATISTICS_LOG" additivity="false">
+        <level value="info" />
+        <appender-ref ref="rpcClientStats" />
+    </logger>
+
 	<logger name="UDP_CLIENT_STATISTICS_LOG" additivity="false">
 		<level value="info" />
 		<appender-ref ref="udpClientStats" />
@@ -40,7 +62,7 @@
 	<!-- ROOT LOGGER -->
 	<root>
 		<priority value="debug" />				
-		<appender-ref ref="udpClientLog" />
+		<appender-ref ref="udpLog" />
 		<appender-ref ref="default.console" />
 	</root>
 </log4j:configuration>
