@@ -78,6 +78,7 @@ public class UDPClient {
                     completed = true;
                 } catch (Exception ex) {
                     // TODO: log failure and retry
+                    System.out.println("Exception: " + ex.getMessage());
                     System.out.println("Server timed-out for request: " + dataPacket);
                     currentAttempt++;
                 }

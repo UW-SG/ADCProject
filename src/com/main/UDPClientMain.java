@@ -21,7 +21,7 @@ public class UDPClientMain {
         try {
             System.out.println("Received args: " + Arrays.toString(args));
 
-           // String csvFile = "D:\\Anurita\\UW\\Fall 2016\\ADC\\test1.csv"; //kvp-operations.csv";
+            // String csvFile = "D:\\Anurita\\UW\\Fall 2016\\ADC\\test1.csv"; //kvp-operations.csv";
             String csvFile = args[2];
             String host = args[0];
             String port = args[1];
@@ -29,27 +29,11 @@ public class UDPClientMain {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(csvFile));
             UDPClient udpClient = new UDPClient();
             String currentData;
-            while((currentData = bufferedReader.readLine()) != null) {
+            while ((currentData = bufferedReader.readLine()) != null) {
 
                 udpClient.encodePacket(currentData, host, port);
             }
-            /*String outstr = "PUT(101, Anurita)";
-            String host = args[0];
-            String port = args[1];
-            UDPClient udpClient = new UDPClient();
-            udpClient.encodePacket(outstr, host, port);
-            outstr = "PUT(201, Mohit)";
-            udpClient.encodePacket(outstr, host, port);
-            udpClient.encodePacket("GET(101)", host, port);
-            udpClient.encodePacket("GET(201)", host, port);
-            udpClient.encodePacket("DELETE(101)", host, port);
-            udpClient.encodePacket("PUT(301, Ruta)", host, port);
-            udpClient.encodePacket("PUT(401, Ratin)", host, port);
-            udpClient.encodePacket("GET(301)", host, port);
-            udpClient.encodePacket("DELETE(101)", host, port);
-            udpClient.encodePacket("DELETE(201)", host, port);
-            udpClient.encodePacket("DELETE(301)", host, port);
-            udpClient.encodePacket("DELETE(401)", host, port);*/
+
             UDPClientMain.computePerformance(udpClient);
 
         } catch (Exception e) {
@@ -89,7 +73,7 @@ public class UDPClientMain {
         }
 
         if (getRequestCount > 0)
-           System.out.println("Average Compute time for UDP GET request:" + getTotalTime / getRequestCount + "ms");
+            System.out.println("Average Compute time for UDP GET request:" + getTotalTime / getRequestCount + "ms");
         if (putRequestCount > 0)
             System.out.println("Average Compute time for UDP PUT request:" + putTotalTime / putRequestCount + "ms");
         if (delRequestCount > 0)
