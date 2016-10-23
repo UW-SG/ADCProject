@@ -6,9 +6,7 @@ import com.utility.DataPacket;
 import com.utility.DataStore;
 import com.utility.OperationUtils;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
+import java.net.*;
 
 /**
  * Created by Anurita on 10/16/2016.
@@ -22,8 +20,13 @@ public class UDPServer {
         dataStore = new DataStore();
 
         try {
-            udpServerSocket = new DatagramSocket(Integer.parseInt(port));
-        } catch (SocketException e) {
+           // udpServerSocket = new DatagramSocket(Integer.parseInt(port));
+            udpServerSocket = new DatagramSocket(null);
+            System.out.println(InetAddress.getLocalHost().getHostAddress());
+            InetSocketAddress inetSocketAddress = new InetSocketAddress(InetAddress.getLocalHost().getHostAddress(),
+                    Integer.parseInt(port));
+            udpServerSocket.bind(inetSocketAddress);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
