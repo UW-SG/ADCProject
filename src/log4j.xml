@@ -23,7 +23,7 @@
 	</appender>
 
 	<appender name="udpLog" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="src/logs/UDP.log" />
+		<param name="File" value="logs/UDP.log" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
         <param name="Append" value="true"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -32,7 +32,7 @@
 	</appender>
 
 	<appender name="udpClientStats" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="src/logs/UDPClientStatistics.txt" />
+		<param name="File" value="logs/UDPClientStatistics.txt" />
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
         <param name="Append" value="true"/>
         <layout class="org.apache.log4j.PatternLayout">
